@@ -1,3 +1,5 @@
+# Sanket Keni
+
 import warnings
 import pandas as pd
 import numpy as np
@@ -9,15 +11,11 @@ def audio():
     playsound('C:\\Users\\Sanket Keni\\Music\\notification.mp3')
 from slackclient import SlackClient
 def slack_message(message, channel):
-    token = 'xoxp-332552408416-334046357094-332656351905-d0acfa81d2cc0be0e3dfba213ad36291'
+    token = '*************************'
     sc = SlackClient(token)
     sc.api_call('chat.postMessage', channel=channel, 
                 text=message, username='My Sweet Bot',
                 icon_emoji=':robot_face:')
-
-
-
-
 
 test_data = pd.read_csv("C:\\Users\\Sanket Keni\\Desktop\\Genesis\\insurance\\test.csv")
 train_data = pd.read_csv("C:\\Users\\Sanket Keni\\Desktop\\Genesis\\insurance\\train.csv")
@@ -77,12 +75,10 @@ sn.distplot(a = (loss_col[:188318]), color = 'blue')
 plt.figure(figsize = (14,8))
 sn.heatmap(complete.corr(), cmap = 'Blues', linewidths = 0.2)
 
-print(test_new.shape)
 
 # Creating dummy variables for the categorical features for further analysis
 complete = pd.get_dummies(complete.iloc[:,:])
-print(complete.head(2))
-print(complete.shape)
+
 
 #188318, 132
 train_new = complete.iloc[:188318,:]
@@ -91,7 +87,7 @@ test_new = complete.iloc[188318:,:]
 test_new = test_new.drop('loss', axis = 1)
 print(test_new.shape)
 
-#Separating predictor and target features
+
 from sklearn.model_selection import train_test_split
 
 y = train_new['loss']
@@ -116,22 +112,22 @@ from sklearn.ensemble import RandomForestRegressor
 
 lasso1 = Lasso(alpha = 0.001, random_state = 20) # increasing alpha reduces the number of features obtained
 lasso1.fit(X_train,y_train)
-lasso_coeff = lasso1.coef_    #Finding the important coefficients.
+lasso_coeff = lasso1.coef_  #Finding the important coefficients.
 index = []
 for i,val in enumerate(lasso_coeff):
     if val!=0:
         index.append(i)
 audio()
-X_train = X_train[:,index]                    #Selecting only important features in the train set
+X_train = X_train[:,index]  #Selecting only important features in the train set
 print(X_train.shape)
 
-X_val = X_val[:,index]                     #Selecting only important features in the validation set
+X_val = X_val[:,index]  #Selecting only important features in the validation set
 X_val.shape
 test_new = test_new.iloc[:,index]
 test_new.shape
 
 l1 = lasso1.fit(X_train, y_train)
-result = mae(np.expm1(y_val), np.expm1(lasso1.predict(X_val)))          #Finding the mean absolute error
+result = mae(np.expm1(y_val), np.expm1(lasso1.predict(X_val)))  #Finding the mean absolute error
 print(result)      #MAE = 1273.7017847938228
 
 
@@ -178,7 +174,7 @@ dt_cv.best_score_                  #0.43054964105397264
 alpha = list([0.01,0.001])
 param_grid = {'alpha' : alpha}
 elastic_net = ElasticNet(random_state = 20)
-elastic_cv = GridSearchCV(elastic_net, param_grid, verbose = 1, cv = 3)     #Applying gridsearch for lasso regression
+elastic_cv = GridSearchCV(elastic_net, param_grid, verbose = 1, cv = 3) #Applying gridsearch for lasso regression
 elastic_cv.fit(X_train,y_train)
 
 print(elastic_cv.best_params_)    #{'alpha': 0.001}
@@ -242,10 +238,12 @@ print(results)  # 1624.7352432828143
 
 
 
-
+# take csv output for Kaggle submission
 test_new = complete.iloc[188318:,:]
+test_new = test_new.iloc[:,index]
 actual_test = test_new.as_matrix()
-predictions = np.expm1(ab_cv.predict(actual_test))
+
+predictions = np.expm1(best_model.predict(actual_test))
 
 ID = test_data["id"]
 predictions = pd.Series(predictions)
